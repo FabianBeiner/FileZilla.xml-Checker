@@ -62,14 +62,22 @@ function testFileZillaSites($strXml = 'FileZilla.xml', $bolShowPasswords = false
             }
 
             $strCon  = $strProtocol . '://';
-            if ($oResult->User && $oResult->Pass) {
-                $strCon .= $oResult->User . ':' . $oResult->Pass . '@';
+
+            $pass = $oResult->Pass;
+
+            if ('base64' == (string)$oResult->Pass->attributes()->encoding) {
+                $pass = base64_decode( $oResult->Pass );
+            }
+
+
+            if ($oResult->User && $pass) {
+                $strCon .= $oResult->User . ':' . $pass . '@';
             }
             $strCon .= $oResult->Host . ':' . $oResult->Port;
 
             $strConPrint = $strCon;
             if (!$bolShowPasswords) {
-                $strConPrint = str_replace(':' . $oResult->Pass . '@', ':' . str_repeat('*', strlen($oResult->Pass)) . '@', $strConPrint);
+                $strConPrint = str_replace(':' . $pass . '@', ':' . str_repeat('*', strlen($pass)) . '@', $strConPrint);
             }
             echo '- <b>' . $oResult->Name . '</b> (' . $strConPrint . ') … ';
 
